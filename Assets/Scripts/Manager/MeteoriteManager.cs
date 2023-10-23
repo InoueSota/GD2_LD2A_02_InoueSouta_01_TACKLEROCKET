@@ -11,6 +11,10 @@ public class MeteoriteManager : MonoBehaviour
 
     private Gravity gravity;
 
+    // 爆発エフェクト
+    [SerializeField] private GameObject explosionCirclePrefab;
+    [SerializeField] private GameObject explosionStarPrefab;
+
     void Start()
     {
         gravity = GetComponent<Gravity>();
@@ -56,7 +60,13 @@ public class MeteoriteManager : MonoBehaviour
                 newScale = collision.gameObject.transform.localScale;
             }
             collision.gameObject.transform.localScale = newScale + Vector3.one * 0.2f;
+            CreateExplosionEffect();
             Destroy(gameObject);
         }
+    }
+
+    public void CreateExplosionEffect()
+    {
+        GameObject explosionCircle = Instantiate(explosionCirclePrefab, transform.position, Quaternion.identity);
     }
 }

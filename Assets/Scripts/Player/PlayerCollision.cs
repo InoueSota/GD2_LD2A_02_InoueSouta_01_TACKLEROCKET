@@ -55,6 +55,10 @@ public class PlayerCollision : MonoBehaviour
             // ダッシュ時
             else
             {
+                // ヒットストップ
+                HitStopManager.instance.StartHitStop(0.1f);
+
+                collision.GetComponent<MeteoriteManager>().CreateExplosionEffect();
                 Destroy(collision.gameObject);
             }
         }

@@ -277,6 +277,7 @@ public class PlayerMove : MonoBehaviour
     void ChangeGravityInitialize()
     {
         fireObj.SetActive(false);
+        chargeCount = 0;
         moveStartPosition = transform.position;
         moveTime = 1f;
         moveLeftTime = moveTime;
