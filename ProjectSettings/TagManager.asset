@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Gravity
   - Meteorite
+  - ScoreManager
   layers:
   - Default
   - TransparentFX
@@ -40,9 +41,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: BackGround
     uniqueID: 3379860935
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0

@@ -24,6 +24,9 @@ public class PlayerMove : MonoBehaviour
     private float pushChargeInterval = 0.65f;
     // チャージ量を得る
     public int chargeCount = 0;
+    // チャージ煙
+    [SerializeField] private GameObject smokePrefab;
+    private float smokeInterval;
 
     // ダッシュ開始フラグ
     private bool isDushActive;
@@ -52,6 +55,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private GameObject leftLineObj;
     [SerializeField] private GameObject rightLineObj;
 
+    private GameManager gameManager;
     private PlayerCollision playerCollision;
     private CameraManager cameraManager;
     private GravityManager gravityManager;
@@ -64,6 +68,8 @@ public class PlayerMove : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0, 0, rotateValue);
         isDushActive = false;
         maxDistance = Vector3.Distance(Vector3.zero, Vector3.one * movePower3);
+
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         playerCollision = GetComponent<PlayerCollision>();
         cameraManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraManager>();
         gravityManager = GetComponent<Gravity>().gravityManager;
@@ -72,10 +78,14 @@ public class PlayerMove : MonoBehaviour
     void Update()
     {
         Rotate();
-        BaseMove();
-        Charge();
-        Dush();
-        ClampInCamera();
+        if (gameManager && gameManager.GetIsStart())
+        {
+            BaseMove();
+            Charge();
+            Dush();
+            ClampInCamera();
+        }
+        Smoke();
     }
 
     void Rotate()
@@ -249,6 +259,26 @@ public class PlayerMove : MonoBehaviour
                 gravityManager.GravityInitialize(GravityManager.GravityPattern.BOTTOM);
                 moveEndPosition = new(moveStartPosition.x, cameraTop - transform.localScale.y * 0.5f, moveStartPosition.z);
             }
+        }
+    }
+
+    void Smoke()
+    {
+        // 煙のエフェクトを作成する
+        smokeInterval += Time.deltaTime;
+        if (smokeInterval >= 0.05f)
+        {
+            GameObject smoke = Instantiate(smokePrefab, new(transform.position.x + Random.Range(-0.15f, 0.15f), transform.position.y - Random.Range(0.45f, 0.6f), transform.position.z), Quaternion.identity);
+            smoke.transform.RotateAround(transform.position, Vector3.forward, rotateValue - 90.0f);
+            if (!playerCollision.isKnockBack && !isDushActive && Input.GetKey(KeyCode.Space))
+            {
+                smoke.GetComponent<SmokeManager>().Initialize(transform.position, 0.5f);
+            }
+            else
+            {
+                smoke.GetComponent<SmokeManager>().Initialize(transform.position, 1.5f);
+            }
+            smokeInterval = 0f;
         }
     }
 

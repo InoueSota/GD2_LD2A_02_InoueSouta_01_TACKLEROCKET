@@ -24,7 +24,7 @@ public class BackGroundParticleManager : MonoBehaviour
         makeTimer += Time.deltaTime;
         if (makeTimer > interval)
         {
-            GameObject newObj = Instantiate(basePrefab, new(Random.Range(-cameraManager.halfWidth, cameraManager.halfWidth), Random.Range(-cameraManager.halfHeight, cameraManager.halfHeight), 0f), Quaternion.identity);
+            GameObject newObj = Instantiate(basePrefab, new(Random.Range(-cameraManager.halfWidth - 1.5f, cameraManager.halfWidth + 1.5f), Random.Range(-cameraManager.halfHeight - 1.5f, cameraManager.halfHeight + 1.5f), 0f), Quaternion.identity);
             newObj.GetComponent<StarManager>().Create();
             makeTimer = 0f;
         }

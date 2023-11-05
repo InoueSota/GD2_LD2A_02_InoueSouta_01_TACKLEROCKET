@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GravityManager : MonoBehaviour
 {
@@ -21,45 +22,101 @@ public class GravityManager : MonoBehaviour
     // èdóÕÇã≠Ç≠Ç∑ÇÈéûä‘ä‘äu
     [SerializeField] private float changeInterval;
 
+    // èdóÕÉåÉxÉã
+    private int gravityLevel;
+    [SerializeField] private GameObject gravityLevelObj;
+    private Text gravityLevelText;
+    private Animator gravityLevelAnimator;
+
+    private GameManager gameManager;
+    [SerializeField] private bool isTitleScene = false;
+
     void Start()
     {
         gravityPower = 0.2f;
+        gravity = Vector2.zero;
+        gravityLevel = 1;
+        if (gravityLevelObj)
+        {
+            gravityLevelText = gravityLevelObj.GetComponent<Text>();
+            gravityLevelAnimator = gravityLevelObj.GetComponent<Animator>();
+        }
     }
 
     void Update()
     {
-        switch (gravityPattern)
+        if (!isTitleScene && !gameManager)
         {
-            case GravityPattern.LEFT:
-                gravity.x = -gravityPower;
-                gravity.y = 0f;
-            break;
-            case GravityPattern.RIGHT:
-                gravity.x = gravityPower;
-                gravity.y = 0f;
-                break;
-            case GravityPattern.TOP:
-                gravity.x = 0f;
-                gravity.y = gravityPower;
-                break;
-            case GravityPattern.BOTTOM:
-                gravity.x = 0f;
-                gravity.y = -gravityPower;
-                break;
+            gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         }
 
-        noChangeTime += Time.deltaTime;
-        if (noChangeTime > changeInterval)
+        if (gameManager && !gameManager.GetIsStart())
         {
-            gravityPower *= 2f;
-            noChangeTime = 0f;
+            gravity = Vector2.zero;
+        }
+
+        if (!isTitleScene && gameManager && gameManager.GetIsStart())
+        {
+            switch (gravityPattern)
+            {
+                case GravityPattern.LEFT:
+                    gravity.x = -gravityPower;
+                    gravity.y = 0f;
+                    break;
+                case GravityPattern.RIGHT:
+                    gravity.x = gravityPower;
+                    gravity.y = 0f;
+                    break;
+                case GravityPattern.TOP:
+                    gravity.x = 0f;
+                    gravity.y = gravityPower;
+                    break;
+                case GravityPattern.BOTTOM:
+                    gravity.x = 0f;
+                    gravity.y = -gravityPower;
+                    break;
+            }
+
+            noChangeTime += Time.deltaTime;
+            if (noChangeTime > changeInterval)
+            {
+                gravityPower *= 2f;
+                gravityLevel++;
+                noChangeTime = 0f;
+                gravityLevelAnimator.SetTrigger("Scaling");
+            }
+        }
+        else if (isTitleScene)
+        {
+            gravityPower = 2f;
+            gravity.y = -gravityPower;
+        }
+
+        if (gravityLevelText)
+        {
+            gravityLevelText.text = "Lv." + gravityLevel.ToString();
         }
     }
 
     public void GravityInitialize(GravityPattern newPattern)
     {
-        gravityPattern = newPattern;
+        if (gravityPattern == newPattern)
+        {
+            // êßå¿éûä‘Çå∏ÇÁÇ∑
+            gameManager.SubtractionOfTimeLimit(3f);
+        }
+        else
+        {
+            gravityPattern = newPattern;
+        }
         noChangeTime = 0f;
+        gravityLevel = 1;
         gravityPower = 0.2f;
+        gravityLevelAnimator.SetTrigger("Scaling");
+    }
+
+    public int GetGravityLevel()
+    {
+        return gravityLevel;
     }
 }

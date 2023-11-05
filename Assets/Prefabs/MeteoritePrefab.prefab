@@ -76,7 +76,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 5ab8bb81c2f9f4740800eea66aa2425a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -102,7 +102,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitSpeed: 2
   explosionCirclePrefab: {fileID: 3951569738798539004, guid: 5a4f5769aa0daf74eb0b38d2b3410da5, type: 3}
-  explosionStarPrefab: {fileID: 3134860959361794162, guid: 4d4f274b417ae6044a098166e65f7d2a, type: 3}
 --- !u!114 &5372100796145742758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityManager: {fileID: 0}
+  isMeteorite: 1
 --- !u!58 &4114382515960064701
 CircleCollider2D:
   m_ObjectHideFlags: 0

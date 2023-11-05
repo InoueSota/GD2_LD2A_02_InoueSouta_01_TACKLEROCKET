@@ -9,24 +9,85 @@ public class MeteoriteManager : MonoBehaviour
     [SerializeField] private float hitSpeed;
     private Vector3 direction;
 
+    // 重力関係
+    private GravityManager gravityManager;
     private Gravity gravity;
+    private CameraManager cameraManager;
+    private ScoreManager scoreManager;
 
     // 爆発エフェクト
     [SerializeField] private GameObject explosionCirclePrefab;
-    [SerializeField] private GameObject explosionStarPrefab;
+
+    private GameManager gameManager;
 
     void Start()
     {
+        gravityManager = GameObject.FindGameObjectWithTag("Gravity").GetComponent<GravityManager>();
         gravity = GetComponent<Gravity>();
+        cameraManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraManager>();
+        scoreManager = GameObject.FindGameObjectWithTag("ScoreManager").GetComponent<ScoreManager>();
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
 
     void Update()
     {
-        if (isHitActive)
+        if (gameManager && gameManager.GetIsStart())
         {
-            Vector3 deltaMove = direction * hitSpeed * Time.deltaTime;
-            transform.position += deltaMove;
+            // 重力辺に当たったら消滅させ、スコアを加算する
+            float cameraLeft = -cameraManager.halfWidth;
+            float cameraRight = cameraManager.halfWidth;
+            float cameraTop = cameraManager.halfHeight;
+            float cameraBottom = -cameraManager.halfHeight;
+            switch (gravityManager.gravityPattern)
+            {
+                case GravityManager.GravityPattern.LEFT:
+                    float thisLeft = transform.position.x - transform.localScale.x * 0.5f;
+                    if (cameraLeft > thisLeft)
+                    {
+                        DestroySelf();
+                    }
+                    break;
+                case GravityManager.GravityPattern.RIGHT:
+                    float thisRight = transform.position.x + transform.localScale.x * 0.5f;
+                    if (cameraRight < thisRight)
+                    {
+                        DestroySelf();
+                    }
+                    break;
+                case GravityManager.GravityPattern.TOP:
+                    float thisTop = transform.position.y + transform.localScale.y * 0.5f;
+                    if (cameraTop < thisTop)
+                    {
+                        DestroySelf();
+                    }
+                    break;
+                case GravityManager.GravityPattern.BOTTOM:
+                    float thisBottom = transform.position.y - transform.localScale.y * 0.5f;
+                    if (cameraBottom > thisBottom)
+                    {
+                        DestroySelf();
+                    }
+                    break;
+            }
+
+            if (isHitActive)
+            {
+                Vector3 deltaMove = direction * hitSpeed * Time.deltaTime;
+                transform.position += deltaMove;
+            }
+
+            if (Vector3.Distance(transform.position, new(0f, 0f, transform.position.z)) > 10f)
+            {
+                Destroy(gameObject);
+            }
         }
+    }
+
+    void DestroySelf()
+    {
+        scoreManager.AddScore(100 * (int)transform.localScale.x);
+        CreateExplosionEffect();
+        Destroy(gameObject);
     }
 
     public void HitPlayerInitialze(Vector3 direction_)
@@ -63,6 +124,11 @@ public class MeteoriteManager : MonoBehaviour
             CreateExplosionEffect();
             Destroy(gameObject);
         }
+    }
+
+    public bool GetIsHitActive()
+    {
+        return isHitActive;
     }
 
     public void CreateExplosionEffect()
